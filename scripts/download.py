@@ -22,6 +22,7 @@ Examples:
   python download.py --download "ff80808172b5f24f0172d9f04f0910af" --format docx 出租车条例.doc
 """
 
+import argparse
 import json
 import os
 import re
@@ -224,91 +225,58 @@ def collect_search_urls(data: dict, fmt: str = "docx") -> list:
     return results
 
 
+def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI argument parser."""
+    parser = argparse.ArgumentParser(
+        prog="download.py",
+        description="Download laws/regulations from China's National Laws and Regulations Database.",
+        epilog="For batch collection see references/batch_collection.md",
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--info", metavar="BBBS_ID", help="Fetch detail info for a law")
+    mode.add_argument("--search", metavar="KEYWORD", help="Search laws by keyword")
+    mode.add_argument("--download", metavar="BBBS_ID", help="Download a single law")
+
+    parser.add_argument("--page", type=int, default=1, help="Search page number (default: 1)")
+    parser.add_argument("--size", type=int, default=20, help="Search page size (default: 20)")
+    parser.add_argument("--urls-only", action="store_true", help="Output signed URLs instead of downloading")
+    parser.add_argument("--format", default="docx", choices=["docx", "pdf"], help="Download format (default: docx)")
+    parser.add_argument("--exact", action="store_true", help="Use exact title match for search")
+    parser.add_argument("output", nargs="?", help="Output path for --download or direct URL mode")
+    return parser
+
+
 def main():
-    args = sys.argv[1:]
-    if not args or args[0] in ("-h", "--help"):
-        print(__doc__)
-        sys.exit(1)
+    parser = build_parser()
+    args = parser.parse_args()
 
-    cmd = args[0]
-
-    if cmd == "--info":
-        if len(args) < 2:
-            print("Usage: python download.py --info <bbbs_id>")
+    # Determine mode: direct URL if no flag but positional output/URL provided
+    if not any([args.info, args.search, args.download]):
+        if not args.output:
+            parser.print_help()
             sys.exit(1)
-        raw = fetch_detail(args[1])
+        if not args.output.startswith(("http://", "https://")):
+            parser.error("Direct mode requires a URL starting with http:// or https://")
+        download_file(args.output, None)
+        return
+
+    if args.info:
+        raw = fetch_detail(args.info)
         print_detail(parse_detail(raw))
 
-    elif cmd == "--search":
-        if len(args) < 2:
-            print("Usage: python download.py --search <keyword> [--page 1] [--size 20] [--urls-only] [--format docx|pdf] [--exact]")
-            sys.exit(1)
-        keyword = args[1]
-        page = 1
-        size = 20
-        urls_only = False
-        fmt = "docx"
-        search_type = 2  # default fuzzy
-        i = 2
-        while i < len(args):
-            a = args[i]
-            if a == "--page" and i + 1 < len(args):
-                page = int(args[i + 1])
-                i += 2
-                continue
-            if a == "--size" and i + 1 < len(args):
-                size = int(args[i + 1])
-                i += 2
-                continue
-            if a == "--urls-only":
-                urls_only = True
-                i += 1
-                continue
-            if a == "--format" and i + 1 < len(args):
-                fmt = args[i + 1]
-                i += 2
-                continue
-            if a == "--exact":
-                search_type = 1
-                i += 1
-                continue
-            i += 1
-        data = search_laws(keyword, page=page, size=size, search_type=search_type)
-        if urls_only:
-            enriched = collect_search_urls(data, fmt)
+    elif args.search:
+        search_type = 1 if args.exact else 2
+        data = search_laws(args.search, page=args.page, size=args.size, search_type=search_type)
+        if args.urls_only:
+            enriched = collect_search_urls(data, args.format)
             json.dump(enriched, sys.stdout, ensure_ascii=False, indent=2)
             print()
         else:
             print_search_results(data)
 
-    elif cmd == "--download":
-        if len(args) < 2:
-            print("Usage: python download.py --download <bbbs_id> [--format docx|pdf] [output]")
-            sys.exit(1)
-        bbbs_id = args[1]
-        fmt = "docx"
-        output = None
-        i = 2
-        while i < len(args):
-            a = args[i]
-            if a == "--format" and i + 1 < len(args):
-                fmt = args[i + 1]
-                i += 2
-                continue
-            if not output and not a.startswith("--"):
-                output = a
-            i += 1
-        url = get_download_url(bbbs_id, fmt)
-        download_file(url, output)
-
-    elif cmd.startswith("http://") or cmd.startswith("https://"):
-        output = args[1] if len(args) > 1 else None
-        download_file(cmd, output)
-
-    else:
-        print(f"Unknown argument: {cmd}")
-        print(__doc__)
-        sys.exit(1)
+    elif args.download:
+        url = get_download_url(args.download, args.format)
+        download_file(url, args.output)
 
 
 if __name__ == "__main__":
