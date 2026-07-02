@@ -469,16 +469,16 @@ python scripts/court_law_crawler.py --info "https://www.court.gov.cn/fabu/xiangq
 **Categories:** 全部(司法解释+司法文件), 司法解释, 司法文件, 重大案件, 通知, 司法数据, 大数据专题, 标准化工作, 任免招录, 开庭公告
 
 | category code | Category name |
-|---------------|--------------|
-| `16` | 司法解释 |
-| `17` | 司法文件 |
-| `15` | 重大案件 |
-| `22` | 通知 |
-| `21` | 司法数据 |
-| `662` | 大数据专题 |
-| `108` | 标准化工作 |
-| `79` | 任免招录 |
-| `14` | 开庭公告 |
+| ------------- | ------------- |
+| `16`          | 司法解释      |
+| `17`          | 司法文件      |
+| `15`          | 重大案件      |
+| `22`          | 通知          |
+| `21`          | 司法数据      |
+| `662`         | 大数据专题    |
+| `108`         | 标准化工作    |
+| `79`          | 任免招录      |
+| `14`          | 开庭公告      |
 
 **Note:** List pages use pagination (`/fabu/gengduo/{id}.html` → `{id}_{n}.html`). Keyword filtering is done client-side on titles.
 
