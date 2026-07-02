@@ -5,7 +5,7 @@ Download/search environmental regulations from the Ministry of Ecology and Envir
 Source: https://www.mee.gov.cn/ywgz/fgbz/
 
 Categories:
-  法律(fl), 行政法规(xzfg), 规章(gzk/gz), 生态环境损害赔偿制度(sthjshpczd)
+  法律(fl), 行政法规(xzfg), 规章(gzk/gz), 生态环境损害赔偿制度(sthjshpczd), 行政复议与执法解释(zfjs)
 
 Usage:
   python mee_law_crawler.py --search "碳" --size 20
@@ -52,6 +52,7 @@ CATEGORY_MAP = {
     "行政法规": "xzfg",
     "规章": "gz",  # actual path is /gzk/gz/
     "生态环境损害赔偿制度": "sthjshpczd",
+    "行政复议与执法解释": "zfjs",
 }
 
 CATEGORY_URLS = {
@@ -59,6 +60,7 @@ CATEGORY_URLS = {
     "xzfg": f"{FG_BASE}/xzfg/",
     "gz": f"{BASE_URL}/gzk/gz/",  # different base path
     "sthjshpczd": f"{FG_BASE}/sthjshpczd/",
+    "zfjs": f"{FG_BASE}/zfjs/",
 }
 
 HEADERS = {
@@ -312,11 +314,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="生态环境部法规标准搜索/下载工具",
         epilog=(
-            "Categories: 全部, 法律, 行政法规, 规章, 生态环境损害赔偿制度\\n\\n"
-            "Examples:\\n"
-            "  python mee_law_crawler.py --search '碳' --size 20\\n"
-            "  python mee_law_crawler.py --category 法律 --size 100\\n"
-            "  python mee_law_crawler.py --category '生态环境损害赔偿制度' --size 30\\n"
+            "Categories: 全部, 法律, 行政法规, 规章, 生态环境损害赔偿制度, 行政复议与执法解释\n\n"
+            "Examples:\n"
+            "  python mee_law_crawler.py --search '碳' --size 20\n"
+            "  python mee_law_crawler.py --category 法律 --size 100\n"
+            "  python mee_law_crawler.py --category '行政复议与执法解释' --size 30\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
