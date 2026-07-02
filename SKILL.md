@@ -1,12 +1,12 @@
 ---
 name: cn-law-hub
 description: >-
-  用于查询、检索、核验、下载、导出、批量采集中国官方法律法规、规章、条约和具体法条。Use this skill aggressively when the user asks to 查法律、查法规、查条例、查规章、查条约、查法条、查第几条、找法律依据、引用法律依据、核验现行有效、判断是否废止/已修改/尚未生效、下载法规全文、导出法规目录、批量下载法规文件、按关键词检索具体法条、展开法条分析，或在中国法律咨询、案例分析、合规审查、合同审查、劳动争议、行政法分析、公司合规、数据合规、政策研究中需要调用、核验或引用中国现行有效法律法规原文作为依据。Trigger also when phrases such as 依法、依规、依照法律规定、法律法规 imply a need to verify specific statutory authority or article-level text. Covers 国家法律法规数据库 (flk.npc.gov.cn), 国家规章库 (gov.cn), 外交条约库 (treaty.mfa.gov.cn), 国务院政策文件库 (sousuo.www.gov.cn), 司法部行政法规库 (xzfg.moj.gov.cn), 党内法规库 (12371.cn), 国防部法规文库 (mod.gov.cn), 税务法规库 (fgk.chinatax.gov.cn), and 生态环境部法规标准 (mee.gov.cn). Supports 标题/正文检索, 精确/模糊检索, 时效性过滤, 分类过滤, 分页, 排序, 单篇下载, 批量下载, 法条级抽取, 地区/制定机关分类, and browser fallback. Trigger when the answer may depend on current effective Chinese statutes, regulations, rules, treaties, article text, official document status, or official source attribution. Do not use for purely general legal theory, generic writing, or legal reasoning that does not require retrieving or verifying official Chinese legal documents.
+  用于查询、检索、核验、下载、导出、批量采集中国官方法律法规、规章、条约和具体法条。Use this skill aggressively when the user asks to 查法律、查法规、查条例、查规章、查条约、查法条、查第几条、找法律依据、引用法律依据、核验现行有效、判断是否废止/已修改/尚未生效、下载法规全文、导出法规目录、批量下载法规文件、按关键词检索具体法条、展开法条分析，或在中国法律咨询、案例分析、合规审查、合同审查、劳动争议、行政法分析、公司合规、数据合规、政策研究中需要调用、核验或引用中国现行有效法律法规原文作为依据。Trigger also when phrases such as 依法、依规、依照法律规定、法律法规 imply a need to verify specific statutory authority or article-level text. Covers 国家法律法规数据库 (flk.npc.gov.cn), 国家规章库 (gov.cn), 外交条约库 (treaty.mfa.gov.cn), 国务院政策文件库 (sousuo.www.gov.cn), 司法部行政法规库 (xzfg.moj.gov.cn), 党内法规库 (12371.cn), 国防部法规文库 (mod.gov.cn), 税务法规库 (fgk.chinatax.gov.cn), 生态环境部法规规章 (mee.gov.cn), and 最高人民法院发布栏目 (court.gov.cn). Supports 标题/正文检索, 精确/模糊检索, 时效性过滤, 分类过滤, 分页, 排序, 单篇下载, 批量下载, 法条级抽取, 地区/制定机关分类, and browser fallback. Trigger when the answer may depend on current effective Chinese statutes, regulations, rules, treaties, article text, official document status, or official source attribution. Do not use for purely general legal theory, generic writing, or legal reasoning that does not require retrieving or verifying official Chinese legal documents.
 ---
 
 # Legal Databases Overview
 
-This skill supports nine legal databases:
+This skill supports ten legal databases:
 
 | Database                     | Script                          | Source                      | Data type         | Auth        |
 | ---------------------------- | ------------------------------- | --------------------------- | ----------------- | ----------- |
@@ -18,7 +18,8 @@ This skill supports nine legal databases:
 | **党内法规库**               | `scripts/party_law_crawler.py`  | `www.12371.cn`              | HTML scraping     | None        |
 | **国防部法规文库**           | `scripts/mod_law_crawler.py`    | `www.mod.gov.cn`            | HTML scraping     | None        |
 | **税务法规库**               | `scripts/tax_law_crawler.py`    | `fgk.chinatax.gov.cn`       | REST API (POST)   | Session     |
-| **生态环境部法规标准**       | `scripts/mee_law_crawler.py`    | `mee.gov.cn`                | HTML scraping     | None        |
+| **生态环境部法规规章**       | `scripts/mee_law_crawler.py`    | `mee.gov.cn`                | HTML scraping     | None        |
+| **最高人民法院发布栏目**     | `scripts/court_law_crawler.py`  | `court.gov.cn`              | HTML scraping     | None        |
 
 # National Laws and Regulations Database (国家法律法规数据库)
 
@@ -420,7 +421,7 @@ POST https://www.chinatax.gov.cn/getFileListByCodeId
 
 ---
 
-# 生态环境部法规标准 (MEE Regulations - mee.gov.cn)
+# 生态环境部法规规章 (MEE Regulations - mee.gov.cn)
 
 **Source:** `https://www.mee.gov.cn/ywgz/fgbz/`
 
@@ -433,7 +434,7 @@ Covers environmental laws, regulations, and rules from the Ministry of Ecology a
 python scripts/mee_law_crawler.py --search "碳" --size 20
 
 # Filter by category
-python scripts/mee_law_crawler.py --category 标准 --size 50
+python scripts/mee_law_crawler.py --category 法律 --size 50
 
 # Fetch detail
 python scripts/mee_law_crawler.py --info "https://www.mee.gov.cn/ywgz/fgbz/fl/202603/t20260313_1146496.shtml"
@@ -442,6 +443,44 @@ python scripts/mee_law_crawler.py --info "https://www.mee.gov.cn/ywgz/fgbz/fl/20
 **Categories:** 全部, 法律, 行政法规, 规章, 生态环境损害赔偿制度, 行政复议与执法解释
 
 **Note:** This site uses static HTML pages. All tabs are pre-loaded in the main page HTML. Keyword filtering is done client-side on titles. 标准(环保标准)不包含在本数据源中。
+
+---
+
+# 最高人民法院发布栏目 (Supreme People's Court - court.gov.cn)
+
+**Source:** `https://www.court.gov.cn/fabu.html`
+
+Covers judicial interpretations, judicial documents, major cases, and notices from the Supreme People's Court.
+
+**Script:** `scripts/court_law_crawler.py`
+
+```bash
+# Search by keyword across 司法解释 and 司法文件
+python scripts/court_law_crawler.py --search "建设工程" --size 20
+
+# Filter by category
+python scripts/court_law_crawler.py --category 司法解释 --size 50
+python scripts/court_law_crawler.py --category 司法文件 --size 30
+
+# Fetch detail
+python scripts/court_law_crawler.py --info "https://www.court.gov.cn/fabu/xiangqing/504221.html"
+```
+
+**Categories:** 全部(司法解释+司法文件), 司法解释, 司法文件, 重大案件, 通知, 司法数据, 大数据专题, 标准化工作, 任免招录, 开庭公告
+
+| category code | Category name |
+|---------------|--------------|
+| `16` | 司法解释 |
+| `17` | 司法文件 |
+| `15` | 重大案件 |
+| `22` | 通知 |
+| `21` | 司法数据 |
+| `662` | 大数据专题 |
+| `108` | 标准化工作 |
+| `79` | 任免招录 |
+| `14` | 开庭公告 |
+
+**Note:** List pages use pagination (`/fabu/gengduo/{id}.html` → `{id}_{n}.html`). Keyword filtering is done client-side on titles.
 
 ---
 
